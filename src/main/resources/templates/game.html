@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Tic-Tac-Toe Game</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #e6e6e6;
+            margin: 0;
+            text-align: center;
+        }
+        .container {
+            background-color: white;
+            padding: 2em;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 0.5em;
+        }
+        .board {
+            display: grid;
+            gap: 5px;
+            margin: 1em auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #ccc;
+        }
+        .board-cell {
+            background-color: #f9f9f9;
+            width: 80px;
+            height: 80px;
+            font-size: 2em;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            transition: background-color 0.2s, transform 0.2s;
+            position: relative;
+        }
+        .board-cell:hover:not([disabled]) {
+            background-color: #e0e0e0;
+            transform: scale(1.05);
+        }
+        .board-cell:active:not([disabled]) {
+            transform: scale(0.95);
+        }
+        .board-cell[disabled] {
+            cursor: not-allowed;
+            color: #888;
+        }
+        .board-cell.player-x {
+            color: #E74C3C;
+        }
+        .board-cell.player-o {
+            color: #3498DB;
+        }
+        .status {
+            font-size: 1.5em;
+            margin-bottom: 1em;
+            color: #555;
+            font-weight: bold;
+        }
+        .winner {
+            color: #27AE60;
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+        .draw {
+            color: #F1C40F;
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+        .restart-link {
+            text-decoration: none;
+            color: white;
+            background-color: #2ECC71;
+            padding: 0.8em 1.5em;
+            border-radius: 50px;
+            margin-top: 1em;
+            transition: background-color 0.2s;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .restart-link:hover {
+            background-color: #28B463;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Tic-Tac-Toe Game</h1>
+
+    <p th:if="${game.winner != null}" class="status winner">
+        Winner: <span th:text="${game.winner}"></span>!
+    </p>
+    <p th:if="${game.isGameOver and game.winner == null}" class="status draw">
+        Game Over, It's a Draw!
+    </p>
+    <p th:if="${!game.isGameOver}" class="status">
+        Current Player: <span th:text="${game.currentPlayer}"></span>
+    </p>
+
+    <div class="board" th:style="'grid-template-columns: repeat(' + ${boardSize} + ', 1fr);'">
+        <div th:each="cell, iterStat : ${game.board}">
+            <form th:action="@{/game/{id}/move(id=${game.gameId})}" method="post">
+                <input type="hidden" name="position" th:value="${iterStat.index}">
+                <button type="submit" class="board-cell"
+                        th:classappend="${cell == 'X'} ? 'player-x' : (${cell == 'O'} ? 'player-o' : '')"
+                        th:text="${cell}"
+                        th:disabled="${!cell.isEmpty() || game.isGameOver}">
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <a th:if="${game.isGameOver}" href="/" class="restart-link">Start a New Game</a>
+</div>
+</body>
+</html>
